@@ -1,7 +1,11 @@
 import inquirer from "inquirer";
 import { gameReducer, move } from "./game";
 import { createStore } from "redux";
-// import winner from "./game/winner.js";
+import ai from "./game/ai"
+import moves from './game/ai'
+
+// Create the store
+const game = createStore(gameReducer);
 
 const printBoard = () => {
   const { board } = game.getState();
@@ -28,8 +32,14 @@ const getInput = player => async () => {
   game.dispatch(move([row, col]));
 };
 
-// Create the store
-const game = createStore(gameReducer);
+const computer = player => () => {
+  const state = game.getState();
+  if (state.turn === player) {
+    const computerMove = ai(state);
+    game.dispatch(move(computerMove[0].move));
+    console.log(computerMove)
+  }
+}
 
 // Debug: Print the state
 // game.subscribe(() => console.log(game.getState()))
@@ -42,7 +52,8 @@ const game = createStore(gameReducer);
 
 game.subscribe(printBoard);
 game.subscribe(getInput("X"));
-game.subscribe(getInput("O"));
+// game.subscribe(getInput("O"));
+game.subscribe(computer('O'));
 game.subscribe(() => {
   const winner = game.getState().winner;
   if (winner) {

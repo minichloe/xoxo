@@ -8,7 +8,6 @@ const O = "O";
 const MOVE = "MOVE";
 const START = "START";
 const END = "END";
-const primes = [[2, 3, 5], [7, 11, 13], [17, 19, 23]];
 
 const move = position => ({
   type: "MOVE",
@@ -28,6 +27,7 @@ function boardReducer(board = Map(), player, action) {
 
 function scoreReducer(score, player, action) {
   if (action.type === MOVE) {
+    const primes = [[2, 3, 5], [7, 11, 13], [17, 19, 23]];
     const scoreFactor = primes[action.position[0]][action.position[1]];
     return player === "X"
       ? { X: score.X * scoreFactor, O: score.O }
@@ -47,7 +47,8 @@ function gameReducer(
     turn: X,
     score: { X: 1, O: 1 },
     gameOver: false,
-    winner: null
+    winner: null,
+    remaining: 9
   },
   action
 ) {
@@ -60,11 +61,13 @@ function gameReducer(
   const board = boardReducer(state.board, state.turn, action);
   const nextScore = scoreReducer(state.score, state.turn, action);
   const winningPlayer = winner(nextScore) ? state.turn : null;
+  const remaining = state.board === board ? state.remaining : state.remaining - 1
   return {
     board,
     turn,
     score: nextScore,
-    winner: winningPlayer
+    winner: winningPlayer,
+    remaining
   };
 }
 

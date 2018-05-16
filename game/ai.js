@@ -1,19 +1,19 @@
-import reducer, {move, bad} from '.'
+import {gameReducer, move, bad} from './index'
 
 /**
  * moves(State) -> [...Action]
  * 
  * Return an array of actions which are valid moves from the given state.
  */
-export const moves = game => {
-  const state = game.getState();
+export const moves = state => {
   const COORDS = [
     [0, 0], [0, 1], [0, 2],
     [1, 0], [1, 1], [1, 2],
     [2, 0], [2, 1], [2, 2],
   ]
+  const validMoves = COORDS.filter(position => !state.board.getIn(position))
   return COORDS.filter(position => !state.board.getIn(position))
-} 
+}
 
 // TODO
 
@@ -27,10 +27,11 @@ export const moves = game => {
  * is state from which we can only lose.
  */
 
-const score = (game, move) => {
-  const state = game.getState();
-  const future = reducer(state, move);
+const score = (state, moveCoord) => {
+  const future = gameReducer(state, move(moveCoord));
   if (!future.winner) return Math.max(...moves(future).map(move => score(future, move)))
+  // if (!future.winner) return 1;
+  else if (!future.remaining) return 0
   else if (future.winner === future.turn) return -1
   else return 1;
 }
@@ -41,6 +42,12 @@ const score = (game, move) => {
  * Return the best action for the current player.
  */
 export default state => moves(state)
-  .map(move => Object.assign({}, move, {
+  .map(move => Object.assign({}, {
+    move,
     score: score(state, move)
-  })).sort((a, b) => b.score - a.score)[0]
+  }))
+  .sort((a, b) => b.score - a.score)
+
+// takes moves(state) into array of coordinates
+// map through each one
+// each turns into an object with { move: [1,1], score: (original state, move coordinates)}
