@@ -5,7 +5,16 @@ import reducer, {move, bad} from '.'
  * 
  * Return an array of actions which are valid moves from the given state.
  */
-export const moves = game => [] // TODO
+export const moves = game => {
+  const COORDS = [
+    [0, 0], [0, 1], [0, 2],
+    [1, 0], [1, 1], [1, 2],
+    [2, 0], [2, 1], [2, 2],
+  ]
+  return COORDS.filter(position => !game.board.getIn(position))
+} 
+
+// TODO
 
 /**
  * score(game: State, move: Action) -> Number
@@ -16,8 +25,9 @@ export const moves = game => [] // TODO
  * Scores will be numbers from -1 to +1. 1 is a winning state, -1
  * is state from which we can only lose.
  */
+
 const score = (game, move) => {
-  // TODO
+  const future = reducer(game, move);
 }
 
 /**

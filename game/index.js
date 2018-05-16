@@ -36,31 +36,40 @@ function scoreReducer(score, player, action) {
   return score;
 }
 
+function bad (state, action) {
+  if (!state.board.getIn(action.position)) return null;
+  else return 'Wrong move!'
+}
+
 function gameReducer(
   state = {
     board,
     turn: X,
     score: { X: 1, O: 1 },
-    gameOver: false
+    gameOver: false,
+    winner: null
   },
   action
 ) {
   if (action.type !== MOVE) return state;
+  if (bad(state, action)) {
+    console.log(bad(state, action));
+    return state;
+  }
   const turn = turnReducer(state.turn, action);
   const board = boardReducer(state.board, state.turn, action);
   const nextScore = scoreReducer(state.score, state.turn, action);
-  if (winner(nextScore)) {
-    console.log(state.turn + " has won");
-    process.exit(0);
-  }
+  const winningPlayer = winner(nextScore) ? state.turn : null;
   return {
     board,
     turn,
-    score: nextScore
+    score: nextScore,
+    winner: winningPlayer
   };
 }
 
 module.exports = {
   gameReducer,
-  move
+  move,
+  bad
 };

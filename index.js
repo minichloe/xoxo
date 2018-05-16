@@ -14,9 +14,6 @@ const printBoard = () => {
 };
 
 const getInput = player => async () => {
-  // if (game.getState().gameOver) {
-  //   console.log(`${player} has won~`);
-  // } else {
   const { turn } = game.getState();
   if (turn !== player) return;
   const ans = await inquirer.prompt([
@@ -46,6 +43,13 @@ const game = createStore(gameReducer);
 game.subscribe(printBoard);
 game.subscribe(getInput("X"));
 game.subscribe(getInput("O"));
+game.subscribe(() => {
+  const winner = game.getState().winner;
+  if (winner) {
+    console.log(`${winner} wins!`)
+    process.exit(0);
+  }
+})
 
 // We dispatch a dummy START action to call all our
 // subscribers the first time.
